@@ -23,8 +23,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
-import static org.springframework.security.config.Customizer.withDefaults;
-
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -35,29 +33,25 @@ public class SecurityConfig {
     private final UserService userService;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
-                .cors(withDefaults())
-                .authorizeHttpRequests(
-                        request -> request
-                                .requestMatchers("/v1/auth/**").permitAll()
-                                .requestMatchers("/v1/greetings/welcome").permitAll()
-                                .requestMatchers("/student/**").permitAll()
-                                .requestMatchers("/swagger/**").permitAll()
-                                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll()
-                                .requestMatchers("/api/swagger-ui.html", "/api/v3/api-docs/**", "/api/swagger-resources/**", "/api/webjars/**").permitAll()
-                                //.requestMatchers("/**").authenticated()
-
-                                .anyRequest().authenticated())
-                .sessionManagement(
-                        session -> session
-                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/v1/auth/**").permitAll()
+                        .requestMatchers("/v1/greetings/welcome").permitAll()
+                        .requestMatchers("/student/**").permitAll()
+                        .requestMatchers("/career/**").permitAll()
+                        .requestMatchers("/loans/**").permitAll()
+                        .requestMatchers("/reservations/**").permitAll()
+                        .requestMatchers("/books/**").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/swagger-ui.html").permitAll()
+                        .anyRequest().authenticated())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
-
 
     @Bean
     CorsConfigurationSource corsConfigurationSource() {

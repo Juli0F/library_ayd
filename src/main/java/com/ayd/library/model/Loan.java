@@ -1,5 +1,6 @@
 package com.ayd.library.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -16,7 +17,7 @@ public class Loan {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private Integer id;
+    private Long id;
 
     @NotNull
     @Column(name = "loanDate", nullable = false)
@@ -37,11 +38,13 @@ public class Loan {
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "studentId", nullable = false)
+    @JsonBackReference(value = "loan")
     private Student student;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "bookCode", nullable = false)
+    @JsonBackReference(value = "loansb")
     private Book bookCode;
 
 }

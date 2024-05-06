@@ -1,5 +1,6 @@
 package com.ayd.library.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -45,9 +46,11 @@ public class Book {
     private Integer availableCopies;
 
     @OneToMany(mappedBy = "bookCode")
+    @JsonManagedReference(value = "loansb")
     private Set<Loan> loans = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "bookCode")
+    @JsonManagedReference(value = "reservationB")
     private Set<Reservation> reservations = new LinkedHashSet<>();
 
 }
