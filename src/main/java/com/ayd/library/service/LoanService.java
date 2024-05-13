@@ -1,5 +1,6 @@
 package com.ayd.library.service;
 
+import com.ayd.library.dto.LoanResponseDto;
 import com.ayd.library.exception.DuplicatedEntityException;
 import com.ayd.library.exception.NotFoundException;
 import com.ayd.library.model.Loan;
@@ -44,8 +45,8 @@ public class LoanService {
                 .orElseThrow(() -> new NotFoundException("Loan not found with ID: " + id));
     }
 
-    public List<Loan> getAllLoans() {
-        return repository.findAll();
+    public List<LoanResponseDto> getAllLoans() {
+        return repository.findLoanDetails();
     }
     @Transactional
     public Loan closeLoan(Long id) throws NotFoundException {
@@ -57,4 +58,6 @@ public class LoanService {
     public List<Loan> findLoansByStatus(String status) {
         return repository.findAllByStatus(status);
     }
+
+
 }

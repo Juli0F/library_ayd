@@ -32,6 +32,10 @@ public class StudentController {
     public ResponseEntity getAllStudents() {
         return ResponseEntity.ok(studentService.getAllActiveStudents());
     }
+    @GetMapping("/entities")
+    public ResponseEntity getAllStudentsEntity() {
+        return ResponseEntity.ok(studentService.getAllActiveStudentsEntity());
+    }
 
     @GetMapping("/{carnet}")
     public ResponseEntity<Student> getStudentByCarnet(@PathVariable String carnet) throws NotFoundException {
@@ -39,7 +43,7 @@ public class StudentController {
     }
 
     @PutMapping("/{carnet}")
-    public ResponseEntity<Student> updateStudent(@PathVariable String carnet, @RequestBody Student student) throws NotFoundException {
+    public ResponseEntity<StudentDto> updateStudent(@PathVariable String carnet, @RequestBody StudentDto student) throws NotFoundException {
         return ResponseEntity.ok(studentService.updateStudent(carnet, student));
     }
 

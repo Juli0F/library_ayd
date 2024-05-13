@@ -1,6 +1,7 @@
 package com.ayd.library.service;
 
 import com.ayd.library.dto.StudentDto;
+import com.ayd.library.dto.StudentLoanResponseDto;
 import com.ayd.library.exception.DuplicatedEntityException;
 import com.ayd.library.exception.NotFoundException;
 import com.ayd.library.model.Career;
@@ -45,20 +46,35 @@ public class StudentService {
     }
 
     @Transactional
-    public Student updateStudent(String carne, Student updatedStudentData) throws NotFoundException {
-        return repository.findById(carne).map(existingStudent -> {
-            existingStudent.setName(updatedStudentData.getName());
-            existingStudent.setCareerCode(updatedStudentData.getCareerCode());
-            return repository.save(existingStudent);
+    public StudentDto updateStudent(String carnet, StudentDto updatedStudentData) throws NotFoundException {
 
-        }).orElseThrow(() -> new NotFoundException("No se encontró la entidad con carnet: " + carne));
+        Student student = repository.findById(carnet)
+                .orElseThrow(() -> new NotFoundException("No se encontró la entidad con carnet: " + carnet));
+
+        student.setName(updatedStudentData.getName());
+        student.setBirthDate(updatedStudentData.getBirthDate());
+
+        Career career = careerService.getCareerByCode(updatedStudentData.getCareer());
+        student.setCareerCode(career);
+
+        repository.save(student);
+
+        return convertToDto(student);
     }
+
 
     public List<StudentDto> getAllActiveStudents() {
         List<Student> students = repository.findAllByStatus(true);
         return students.stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
+    }
+    public List<StudentLoanResponseDto> getAllActiveStudentsEntity() {
+        List <Student> student = repository.findAllByStatus(true);
+        return student.stream()
+                .map(StudentLoanResponseDto::convertToStudentLoanDto)
+                .collect(Collectors.toList());
+
     }
 
 
