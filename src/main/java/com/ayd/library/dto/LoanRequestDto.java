@@ -3,23 +3,23 @@ package com.ayd.library.dto;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public class LoanResponseDto {
-    Long id;
+public class LoanRequestDto {
     String carnet;
     String bookCode;
     LocalDate loanDate;
     LocalDate returnDate;
     String status;
     BigDecimal totalDue;
+    Long id;
 
-    public LoanResponseDto(Long id, String carnet,String bookCode, LocalDate loanDate, LocalDate returnDate, String status, BigDecimal totalDue) {
-        this.id = id;
+    public LoanRequestDto(String carnet, String bookCode,LocalDate loanDate, LocalDate returnDate, String status, BigDecimal totalDue, Long id) {
         this.carnet = carnet;
         this.bookCode = bookCode;
         this.loanDate = loanDate;
         this.returnDate = returnDate;
         this.status = status;
         this.totalDue = totalDue;
+        this.id = id;
     }
 
     public String getBookCode() {
@@ -28,14 +28,6 @@ public class LoanResponseDto {
 
     public void setBookCode(String bookCode) {
         this.bookCode = bookCode;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getCarnet() {
@@ -76,5 +68,13 @@ public class LoanResponseDto {
 
     public void setTotalDue(BigDecimal totalDue) {
         this.totalDue = totalDue;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

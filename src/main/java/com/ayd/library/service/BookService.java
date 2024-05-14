@@ -50,7 +50,7 @@ public class BookService {
                 .orElseThrow(() -> new NotFoundException("Book not found with ID: " + code));
     }
 
-    public Book getBookById(String code) throws NotFoundException {
+    public Book getBookByCode(String code) throws NotFoundException {
         return repository.findById(code)
                 .orElseThrow(() -> new NotFoundException("No se encuentra el libro con el codigo: " + code));
     }

@@ -26,7 +26,7 @@ public class BookController {
 
     @GetMapping("/{code}")
     public ResponseEntity<Book> getBookByCode(@PathVariable String code) throws NotFoundException {
-        return ResponseEntity.ok(bookService.getBookById(code));
+        return ResponseEntity.ok(bookService.getBookByCode(code));
     }
     @GetMapping("/all")
     public ResponseEntity<List<Book>> getAllBooks() throws NotFoundException {

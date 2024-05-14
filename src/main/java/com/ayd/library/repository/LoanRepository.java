@@ -10,7 +10,7 @@ import java.util.List;
 public interface LoanRepository extends JpaRepository<Loan, Long> {
     List<Loan> findAllByStatus(String status);
 
-    @Query("SELECT new com.ayd.library.dto.LoanResponseDto(l.id, s.name, l.loanDate, l.returnDate, l.status, l.totalDue) " +
-            "FROM Loan l JOIN l.student s")
+    @Query("SELECT new com.ayd.library.dto.LoanResponseDto(l.id, s.carnet,b.title, l.loanDate, l.returnDate, l.status, l.totalDue) " +
+            "FROM Loan l JOIN l.student s JOIN l.bookCode b")
     List<LoanResponseDto> findLoanDetails();
 }

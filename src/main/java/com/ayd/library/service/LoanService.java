@@ -1,29 +1,63 @@
 package com.ayd.library.service;
 
+import com.ayd.library.dto.LoanRequestDto;
 import com.ayd.library.dto.LoanResponseDto;
+import com.ayd.library.enums.LoanStatus;
 import com.ayd.library.exception.DuplicatedEntityException;
 import com.ayd.library.exception.NotFoundException;
+import com.ayd.library.exception.QuantityException;
+import com.ayd.library.exception.RequiredEntityException;
 import com.ayd.library.model.Loan;
 import com.ayd.library.repository.LoanRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class LoanService {
 
-    private final LoanRepository repository;
+    @Autowired
+    final LoanRepository repository;
+    @Autowired
+    final StudentService studentService;
+    @Autowired
+    final BookService bookService;
 
     @Transactional
-    public Loan createLoan(Loan loan) throws DuplicatedEntityException {
+    public Loan createLoan(LoanRequestDto loan) throws DuplicatedEntityException, NotFoundException, QuantityException, RequiredEntityException {
+        if (loan.getTotalDue().compareTo(BigDecimal.ZERO) < 0)
+            throw  new QuantityException("Cannot create loan without total due: " + loan.getTotalDue());
+
+        if (loan.getBookCode() == null) {
+            throw new RequiredEntityException("Book code must not be null");
+        }
+
         if (repository.findById(loan.getId()).isPresent()) {
             throw new DuplicatedEntityException("Loan with ID already exists: " + loan.getId());
         }
-        loan.setStatus("active");
-        return repository.save(loan);
+
+        if (loan.getTotalDue().compareTo(BigDecimal.ZERO) < 0) {
+            throw new QuantityException("Cannot create loan without total due: " + loan.getTotalDue());
+        }
+
+        var  studentEntity = studentService.getStudentByCarnet(loan.getCarnet());
+        var  bookEntity = bookService.getBookByCode(loan.getBookCode());
+
+        Loan entity =  Loan.builder()
+                .loanDate(loan.getLoanDate())
+                .returnDate(loan.getReturnDate())
+                .bookCode(bookEntity)
+                .student(studentEntity)
+                .totalDue(loan.getTotalDue())
+                .status(LoanStatus.ACTIVE.name())
+                .build();
+
+        return repository.save(entity);
     }
 
     @Transactional

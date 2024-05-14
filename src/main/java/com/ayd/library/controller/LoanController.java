@@ -1,9 +1,12 @@
 package com.ayd.library.controller;
 
 
+import com.ayd.library.dto.LoanRequestDto;
 import com.ayd.library.dto.LoanResponseDto;
 import com.ayd.library.exception.DuplicatedEntityException;
 import com.ayd.library.exception.NotFoundException;
+import com.ayd.library.exception.QuantityException;
+import com.ayd.library.exception.RequiredEntityException;
 import com.ayd.library.model.Loan;
 import com.ayd.library.service.LoanService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +23,10 @@ public class LoanController {
     private LoanService loanService;
 
     @PostMapping
-    public ResponseEntity<Loan> createLoan(@RequestBody Loan loan) throws DuplicatedEntityException {
-        return ResponseEntity.ok(loanService.createLoan(loan));
+    public ResponseEntity<Loan> createLoan(@RequestBody LoanRequestDto loanRequestDto) throws DuplicatedEntityException,
+            NotFoundException, QuantityException, RequiredEntityException {
+
+        return ResponseEntity.ok(loanService.createLoan(loanRequestDto));
     }
 
     @GetMapping("/{id}")
