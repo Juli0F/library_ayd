@@ -30,7 +30,7 @@ CREATE TABLE Loan (
     id INT AUTO_INCREMENT PRIMARY KEY,
     loanDate DATE NOT NULL,
     returnDate DATE,
-    status ENUM('active', 'returned', 'delinquent') NOT NULL,
+    status ENUM('active', 'returned', 'lost') NOT NULL,
     totalDue DECIMAL(10, 2),
     studentId VARCHAR(10) NOT NULL,
     bookCode VARCHAR(20) NOT NULL,

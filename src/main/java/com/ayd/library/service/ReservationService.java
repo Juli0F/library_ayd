@@ -1,10 +1,16 @@
 package com.ayd.library.service;
 
+import com.ayd.library.dto.LoanResponseDto;
+import com.ayd.library.dto.ReservationRequestDto;
+import com.ayd.library.enums.ReservationStatusEnum;
 import com.ayd.library.exception.DuplicatedEntityException;
+import com.ayd.library.exception.EnoughException;
 import com.ayd.library.exception.NotFoundException;
+import com.ayd.library.exception.RequiredEntityException;
 import com.ayd.library.model.Reservation;
 import com.ayd.library.repository.ReservationRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,15 +20,37 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReservationService {
 
-    private final ReservationRepository repository;
+    @Autowired
+    final ReservationRepository repository;
+    @Autowired
+    final StudentService studentService;
+    @Autowired
+    final BookService bookService;
 
     @Transactional
-    public Reservation createReservation(Reservation reservation) throws DuplicatedEntityException {
+    public Reservation createReservation(ReservationRequestDto reservation) throws DuplicatedEntityException, RequiredEntityException, NotFoundException, EnoughException {
+        if (reservation.getBookCode() == null) {
+            throw new RequiredEntityException("Book code must not be null");
+        }
+
         if (repository.findById(reservation.getId()).isPresent()) {
             throw new DuplicatedEntityException("Reservation with ID already exists: " + reservation.getId());
         }
-        reservation.setStatus("active");
-        return repository.save(reservation);
+        var  studentEntity = studentService.getStudentByCarnet(reservation.getCarnet());
+        var  bookEntity = bookService.getBookByCode(reservation.getBookCode());
+
+        if(bookEntity.getAvailableCopies() == 0) {
+                throw new EnoughException("Enough available copies");
+        }
+
+        Reservation entity = Reservation.builder()
+                .reservationDate(reservation.getReservationDate())
+                .bookCode(bookEntity)
+                .status(ReservationStatusEnum.ACTIVE.name())
+                .student(studentEntity)
+                .build();
+
+        return repository.save(entity);
     }
 
     @Transactional
@@ -47,6 +75,7 @@ public class ReservationService {
         return repository.findAll();
     }
 
+
     @Transactional
     public Reservation updateReservationStatus(Long id, String status) throws NotFoundException {
         Reservation reservation = repository.findById(id)
@@ -58,4 +87,9 @@ public class ReservationService {
     public List<Reservation> findReservationsByStatus(String status) {
         return repository.findAllByStatus(status);
     }
+
+    public List<ReservationRequestDto> getAllReservation() {
+        return repository.findReservationDetails();
+    }
+
 }

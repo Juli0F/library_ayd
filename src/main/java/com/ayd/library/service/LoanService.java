@@ -3,10 +3,7 @@ package com.ayd.library.service;
 import com.ayd.library.dto.LoanRequestDto;
 import com.ayd.library.dto.LoanResponseDto;
 import com.ayd.library.enums.LoanStatus;
-import com.ayd.library.exception.DuplicatedEntityException;
-import com.ayd.library.exception.NotFoundException;
-import com.ayd.library.exception.QuantityException;
-import com.ayd.library.exception.RequiredEntityException;
+import com.ayd.library.exception.*;
 import com.ayd.library.model.Loan;
 import com.ayd.library.repository.LoanRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,26 +26,26 @@ public class LoanService {
     final BookService bookService;
 
     @Transactional
-    public Loan createLoan(LoanRequestDto loan) throws DuplicatedEntityException, NotFoundException, QuantityException, RequiredEntityException {
+    public Loan createLoan(LoanRequestDto loan) throws DuplicatedEntityException, NotFoundException, QuantityException, RequiredEntityException, EnoughException {
         if (loan.getTotalDue().compareTo(BigDecimal.ZERO) < 0)
-            throw  new QuantityException("Cannot create loan without total due: " + loan.getTotalDue());
+            throw new QuantityException("Cannot create loan without total due: " + loan.getTotalDue());
 
         if (loan.getBookCode() == null) {
             throw new RequiredEntityException("Book code must not be null");
+        }
+
+        var studentEntity = studentService.getStudentByCarnet(loan.getCarnet());
+        var bookEntity = bookService.getBookByCode(loan.getBookCode());
+
+        if (bookEntity.getAvailableCopies() == 0) {
+            throw new EnoughException("Enough available copies");
         }
 
         if (repository.findById(loan.getId()).isPresent()) {
             throw new DuplicatedEntityException("Loan with ID already exists: " + loan.getId());
         }
 
-        if (loan.getTotalDue().compareTo(BigDecimal.ZERO) < 0) {
-            throw new QuantityException("Cannot create loan without total due: " + loan.getTotalDue());
-        }
-
-        var  studentEntity = studentService.getStudentByCarnet(loan.getCarnet());
-        var  bookEntity = bookService.getBookByCode(loan.getBookCode());
-
-        Loan entity =  Loan.builder()
+        Loan entity = Loan.builder()
                 .loanDate(loan.getLoanDate())
                 .returnDate(loan.getReturnDate())
                 .bookCode(bookEntity)

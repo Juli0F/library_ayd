@@ -11,6 +11,7 @@ public class BookRequestDto {
     String publisher;
     Integer availableCopies;
 
+    public BookRequestDto(){}
     public BookRequestDto(String code, String title, String author, LocalDate publicationDate, String publisher, Integer availableCopies) {
         this.code = code;
         this.title = title;

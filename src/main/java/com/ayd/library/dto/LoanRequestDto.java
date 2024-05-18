@@ -12,6 +12,7 @@ public class LoanRequestDto {
     BigDecimal totalDue;
     Long id;
 
+    public LoanRequestDto() {}
     public LoanRequestDto(String carnet, String bookCode,LocalDate loanDate, LocalDate returnDate, String status, BigDecimal totalDue, Long id) {
         this.carnet = carnet;
         this.bookCode = bookCode;
