@@ -5,7 +5,7 @@ public enum ReservationStatusEnum {
     EXPIRED("expired"),
     COMPLETED("completed");
 
-    String value;
+    final String value;
     ReservationStatusEnum(String value) {
         this.value = value;
     }

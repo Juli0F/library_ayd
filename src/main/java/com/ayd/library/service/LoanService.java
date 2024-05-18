@@ -18,11 +18,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class LoanService {
 
-    @Autowired
     final LoanRepository repository;
-    @Autowired
     final StudentService studentService;
-    @Autowired
     final BookService bookService;
 
     @Transactional

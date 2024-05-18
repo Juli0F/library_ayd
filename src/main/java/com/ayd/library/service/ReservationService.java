@@ -20,11 +20,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReservationService {
 
-    @Autowired
     final ReservationRepository repository;
-    @Autowired
+
     final StudentService studentService;
-    @Autowired
+
     final BookService bookService;
 
     @Transactional
@@ -33,14 +32,15 @@ public class ReservationService {
             throw new RequiredEntityException("Book code must not be null");
         }
 
+        var studentEntity = studentService.getStudentByCarnet(reservation.getCarnet());
+        var bookEntity = bookService.getBookByCode(reservation.getBookCode());
+
+        if (bookEntity.getAvailableCopies() == 0) {
+            throw new EnoughException("Not enough available copies");
+        }
+
         if (repository.findById(reservation.getId()).isPresent()) {
             throw new DuplicatedEntityException("Reservation with ID already exists: " + reservation.getId());
-        }
-        var  studentEntity = studentService.getStudentByCarnet(reservation.getCarnet());
-        var  bookEntity = bookService.getBookByCode(reservation.getBookCode());
-
-        if(bookEntity.getAvailableCopies() == 0) {
-                throw new EnoughException("Enough available copies");
         }
 
         Reservation entity = Reservation.builder()

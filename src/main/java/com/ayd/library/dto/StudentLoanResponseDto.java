@@ -66,6 +66,7 @@ public class StudentLoanResponseDto {
             Hibernate.initialize(student.getCareerCode());
         }
         //String carnet, String name, String career, boolean status, Set<Loan> loans
+        assert student.getCareerCode() != null;
         return new StudentLoanResponseDto(
                 student.getCarnet(),
                 student.getName(),

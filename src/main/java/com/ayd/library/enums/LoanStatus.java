@@ -5,7 +5,7 @@ public enum LoanStatus {
     RETURNED("returned"),
     DELINQUENT("delinquent");
 
-    String value;
+    final String value;
     LoanStatus(String value) {
         this.value = value;
     }

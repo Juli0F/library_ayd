@@ -16,8 +16,7 @@ import java.util.List;
 @RequestMapping("/books")
 public class BookController {
 
-    @Autowired
-    private BookService bookService;
+     BookService bookService;
 
     @PostMapping
     public ResponseEntity<Book> createBook(@RequestBody BookRequestDto bookDto) throws DuplicatedEntityException {

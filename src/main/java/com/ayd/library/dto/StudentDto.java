@@ -12,6 +12,7 @@ public class StudentDto {
     String career;
     boolean status;
 
+    public StudentDto() {}
     public StudentDto(String carnet, String name, LocalDate birthDate, String career, boolean status) {
         this.carnet = carnet;
         this.name = name;

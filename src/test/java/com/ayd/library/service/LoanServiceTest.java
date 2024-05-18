@@ -56,7 +56,7 @@ public class LoanServiceTest {
 
         student = Student.builder()
                 .carnet("123456")
-                .name("John Doe")
+                .name("Julio Test")
                 .build();
 
         book = Book.builder()
@@ -95,8 +95,16 @@ public class LoanServiceTest {
     }
 
     @Test
-    public void testCreateLoan_DuplicatedEntityException() {
+    public void testCreateLoan_DuplicatedEntityException() throws NotFoundException {
         // Arrange
+        when(loanRepository.findById(loanRequestDto.getId())).thenReturn(Optional.of(loan));
+        when(studentService.getStudentByCarnet(loanRequestDto.getCarnet())).thenReturn(student);
+        when(bookService.getBookByCode(loanRequestDto.getBookCode())).thenReturn(book);
+
+        // Act & Assert
+        assertThrows(DuplicatedEntityException.class, () -> loanService.createLoan(loanRequestDto));
+        verify(loanRepository, times(1)).findById(loanRequestDto.getId());
+        verify(loanRepository, times(0)).save(any(Loan.class));
     }
 
     @Test

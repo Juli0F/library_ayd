@@ -20,11 +20,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class StudentService {
 
-    @Autowired
-    StudentRepository repository;
+    final StudentRepository repository;
 
-    @Autowired
-    CareerService careerService;
+    final CareerService careerService;
+
     @Transactional
     public StudentDto createStudent(StudentDto studentDto) throws DuplicatedEntityException, NotFoundException {
         if(repository.findById(studentDto.getCarnet()).isPresent()) {
@@ -106,6 +105,7 @@ public class StudentService {
         if (student.getCareerCode() != null && !Hibernate.isInitialized(student.getCareerCode())) {
             Hibernate.initialize(student.getCareerCode());
         }
+        assert student.getCareerCode() != null;
         return new StudentDto(
                 student.getCarnet(),
                 student.getName(),

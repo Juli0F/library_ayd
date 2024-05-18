@@ -16,8 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BookService {
 
-    @Autowired
-    BookRepository repository;
+    final BookRepository repository;
 
     @Transactional
     public Book createBook(BookRequestDto bookDto) throws DuplicatedEntityException{

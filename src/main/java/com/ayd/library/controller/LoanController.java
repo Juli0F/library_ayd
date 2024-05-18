@@ -16,7 +16,6 @@ import java.util.List;
 @RequestMapping("/loans")
 public class LoanController {
 
-    @Autowired
     private LoanService loanService;
 
     @PostMapping

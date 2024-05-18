@@ -15,7 +15,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CareerService {
 
-    @Autowired
     private final CareerRepository repository;
 
     @Transactional
