@@ -38,11 +38,6 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/student/**").permitAll()
-                        .requestMatchers("/career/**").permitAll()
-                        .requestMatchers("/loans/**").permitAll()
-                        .requestMatchers("/reservations/**").permitAll()
-                        .requestMatchers("/books/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/swagger-ui.html").permitAll()
                         .anyRequest().authenticated())

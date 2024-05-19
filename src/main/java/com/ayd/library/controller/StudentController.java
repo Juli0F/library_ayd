@@ -6,10 +6,12 @@ import com.ayd.library.exception.ServiceException;
 import com.ayd.library.model.Student;
 import com.ayd.library.service.StudentService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/student")
+@PreAuthorize("hasAuthority('LIBRARIAN')")
 public class StudentController {
 
     StudentService studentService;
@@ -44,6 +46,7 @@ public class StudentController {
     }
 
     @PutMapping("/{carnet}")
+    @PreAuthorize("hasAuthority('LIBRARIAN') or hasAuthority('STUDENT')")
     public ResponseEntity<StudentDto> updateStudent(@PathVariable String carnet, @RequestBody StudentDto student) throws NotFoundException {
         return ResponseEntity.ok(studentService.updateStudent(carnet, student));
     }

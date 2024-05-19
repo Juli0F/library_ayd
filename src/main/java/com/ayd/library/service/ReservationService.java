@@ -27,7 +27,7 @@ public class ReservationService {
     final BookService bookService;
 
     @Transactional
-    public Reservation createReservation(ReservationRequestDto reservation) throws DuplicatedEntityException, RequiredEntityException, NotFoundException, EnoughException {
+    public Reservation  createReservation(ReservationRequestDto reservation) throws DuplicatedEntityException, RequiredEntityException, NotFoundException, EnoughException {
         if (reservation.getBookCode() == null) {
             throw new RequiredEntityException("Book code must not be null");
         }

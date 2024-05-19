@@ -134,6 +134,24 @@ public class AuthenticationServiceIntegrationTest {
         assertEquals("User not found", thrown.getMessage());
     }
 
+//    @Test
+//    public void testSignin() throws ServiceException, IOException, DuplicatedEntityException {
+//        // Arrange
+//        User createdUser = authenticationService.signup(userRequestDto);
+//        Authentication authentication = mock(Authentication.class);
+//        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+//                .thenReturn(authentication);
+//        when(jwtService.generateToken(createdUser)).thenReturn("testtoken");
+//
+//        // Act
+//        String token =authenticationService.signin(credentialsDto);
+//
+//        // Assert
+//        assertNotNull(token);
+//        assertEquals("testtoken", token);
+//        verify(authenticationManager, times(1)).authenticate(any(UsernamePasswordAuthenticationToken.class));
+//        verify(jwtService, times(1)).generateToken(createdUser);
+//    }
 
     @Test
     public void testSignin_UserNotFoundException() {

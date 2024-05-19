@@ -9,12 +9,14 @@ import com.ayd.library.service.BookService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/books")
+@PreAuthorize("hasAuthority('LIBRARIAN')" )
 public class BookController {
 
      BookService bookService;
@@ -33,6 +35,7 @@ public class BookController {
         return ResponseEntity.ok(bookService.getBookByCode(code));
     }
     @GetMapping("/all")
+    @PreAuthorize("hasAuthority('LIBRARIAN') or hasAuthority('STUDENT')")
     public ResponseEntity<List<Book>> getAllBooks() throws NotFoundException {
         return ResponseEntity.ok(bookService.getAllBooks());
     }

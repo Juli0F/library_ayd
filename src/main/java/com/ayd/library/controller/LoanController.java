@@ -8,12 +8,14 @@ import com.ayd.library.model.Loan;
 import com.ayd.library.service.LoanService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/loans")
+@PreAuthorize("hasAuthority('LIBRARIAN') or hasAuthority('STUDENT')")
 public class LoanController {
 
     private final LoanService loanService;
