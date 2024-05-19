@@ -16,7 +16,11 @@ import java.util.List;
 @RequestMapping("/loans")
 public class LoanController {
 
-    private LoanService loanService;
+    private final LoanService loanService;
+
+    public LoanController(LoanService loanService) {
+        this.loanService = loanService;
+    }
 
     @PostMapping
     public ResponseEntity<Loan> createLoan(@RequestBody LoanRequestDto loanRequestDto) throws ServiceException {

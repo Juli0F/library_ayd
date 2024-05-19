@@ -5,6 +5,7 @@ import com.ayd.library.dto.LoanResponseDto;
 import com.ayd.library.enums.LoanStatus;
 import com.ayd.library.exception.*;
 import com.ayd.library.model.Loan;
+import com.ayd.library.model.Student;
 import com.ayd.library.repository.LoanRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +42,6 @@ public class LoanService {
         if (repository.findById(loan.getId()).isPresent()) {
             throw new DuplicatedEntityException("Loan with ID already exists: " + loan.getId());
         }
-
         Loan entity = Loan.builder()
                 .loanDate(loan.getLoanDate())
                 .returnDate(loan.getReturnDate())
@@ -87,5 +87,8 @@ public class LoanService {
         return repository.findAllByStatus(status);
     }
 
+    private Integer loanActiveByStudent(Student student) {
 
+        return null;
+    }
 }

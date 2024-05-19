@@ -9,6 +9,10 @@ public class ReservationRequestDto {
     String status;
     Long id;
 
+    public ReservationRequestDto() {
+
+    }
+
     public ReservationRequestDto(String carnet, String bookCode, LocalDate reservationDate, String status, Long id) {
         this.carnet = carnet;
         this.bookCode = bookCode;

@@ -2,6 +2,7 @@ package com.ayd.library.repository;
 
 import com.ayd.library.dto.LoanResponseDto;
 import com.ayd.library.model.Loan;
+import com.ayd.library.model.Student;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -13,4 +14,6 @@ public interface LoanRepository extends JpaRepository<Loan, Long> {
     @Query("SELECT new com.ayd.library.dto.LoanResponseDto(l.id, s.carnet,b.title, l.loanDate, l.returnDate, l.status, l.totalDue) " +
             "FROM Loan l JOIN l.student s JOIN l.bookCode b")
     List<LoanResponseDto> findLoanDetails();
+
+    Integer countByStatusAndStudent(String status, Student student);
 }

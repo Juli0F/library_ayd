@@ -1,4 +1,4 @@
-package com.ayd.library.service;
+package com.ayd.library.unit.service;
 
 import com.ayd.library.dto.ReservationRequestDto;
 import com.ayd.library.enums.ReservationStatusEnum;
@@ -7,6 +7,9 @@ import com.ayd.library.model.Book;
 import com.ayd.library.model.Reservation;
 import com.ayd.library.model.Student;
 import com.ayd.library.repository.ReservationRepository;
+import com.ayd.library.service.BookService;
+import com.ayd.library.service.ReservationService;
+import com.ayd.library.service.StudentService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -1,4 +1,4 @@
-package com.ayd.library.service;
+package com.ayd.library.unit.service;
 
 import com.ayd.library.dto.LoanRequestDto;
 import com.ayd.library.dto.LoanResponseDto;
@@ -8,6 +8,9 @@ import com.ayd.library.model.Book;
 import com.ayd.library.model.Loan;
 import com.ayd.library.model.Student;
 import com.ayd.library.repository.LoanRepository;
+import com.ayd.library.service.BookService;
+import com.ayd.library.service.LoanService;
+import com.ayd.library.service.StudentService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

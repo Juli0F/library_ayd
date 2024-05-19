@@ -61,18 +61,18 @@ public class AuthenticationService {
     }
 
     public String signin(CredentialsDto credentials) throws ServiceException, IOException {
+
         var user = userRepository.findByUsername(credentials.username())
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
         if (!(user.getStatus() == 1))
             throw new ServiceException("User is disabled");
 
-        var authentication = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(credentials.username(), credentials.password()));
-        if (authentication.isAuthenticated()) {
+        var authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(credentials.username(), credentials.password()));
+        if (authentication != null && authentication.isAuthenticated()) {
             return jwtService.generateToken(user);
-        } else {
-            throw new UsernameNotFoundException("Invalid user credentials");
         }
+        throw new UsernameNotFoundException("Invalid user credentials");
+
     }
 }

@@ -50,10 +50,15 @@ CREATE TABLE Reservation (
 
 CREATE TABLE User (
     userId BIGINT AUTO_INCREMENT PRIMARY KEY,
-    role VARCHAR(255) NOT NULL,
+    role ENUM('ADMIN', 'STUDENT', 'LIBRARIAN') NOT NULL,
     name VARCHAR(45) NOT NULL,
     email VARCHAR(45) NOT NULL,
     username VARCHAR(45) NOT NULL UNIQUE,
     password VARCHAR(500) NOT NULL,
     status SMALLINT
 );
+
+INSERT INTO user(role, name, email, username, password, status)
+    VALUES ( 'ADMIN','admin', 'admin@library.com', 'admin','$2a$10$pGLfVa82/68NEZILPMwt1OH7mbDUZz2rIyPt7n/qKp/46H8svm9oO',1),
+           ( 'LIBRARIAN','user', 'user@library.com', 'librarian','$2a$10$pGLfVa82/68NEZILPMwt1OH7mbDUZz2rIyPt7n/qKp/46H8svm9oO',1),
+           ( 'STUDENT','student', 'student@library.com', 'student','$2a$10$pGLfVa82/68NEZILPMwt1OH7mbDUZz2rIyPt7n/qKp/46H8svm9oO',1);

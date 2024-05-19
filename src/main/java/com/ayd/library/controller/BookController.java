@@ -6,6 +6,7 @@ import com.ayd.library.exception.DuplicatedEntityException;
 import com.ayd.library.exception.NotFoundException;
 import com.ayd.library.model.Book;
 import com.ayd.library.service.BookService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,10 @@ import java.util.List;
 public class BookController {
 
      BookService bookService;
+
+    public BookController(BookService bookService) {
+        this.bookService = bookService;
+    }
 
     @PostMapping
     public ResponseEntity<Book> createBook(@RequestBody BookRequestDto bookDto) throws DuplicatedEntityException {
