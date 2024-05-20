@@ -40,7 +40,7 @@ public class Student {
     private Career careerCode;
 
     @OneToMany(mappedBy = "student")
-    @JsonManagedReference(value = "loan")
+    @JsonManagedReference//(value = "loan")
     private Set<Loan> loans = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "student")

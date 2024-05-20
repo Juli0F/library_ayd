@@ -3,7 +3,7 @@ package com.ayd.library.enums;
 public enum LoanStatus {
     ACTIVE("active"),
     RETURNED("returned"),
-    DELINQUENT("delinquent");
+    LOSS("LOSS");
 
     final String value;
     LoanStatus(String value) {

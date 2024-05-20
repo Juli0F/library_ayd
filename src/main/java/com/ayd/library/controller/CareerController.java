@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/career")
-@PreAuthorize("hasAuthority('LIBRARIAN')" )
+@PreAuthorize("hasAuthority('LIBRARIAN')")
 public class CareerController {
 
     CareerService careerService;

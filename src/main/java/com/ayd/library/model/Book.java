@@ -46,7 +46,7 @@ public class Book {
     private Integer availableCopies;
 
     @OneToMany(mappedBy = "bookCode")
-    @JsonManagedReference(value = "loansb")
+    @JsonManagedReference//(value = "loansb")
     private Set<Loan> loans = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "bookCode")

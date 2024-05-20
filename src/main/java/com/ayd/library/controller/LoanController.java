@@ -26,7 +26,6 @@ public class LoanController {
 
     @PostMapping
     public ResponseEntity<Loan> createLoan(@RequestBody LoanRequestDto loanRequestDto) throws ServiceException {
-
         return ResponseEntity.ok(loanService.createLoan(loanRequestDto));
     }
 
