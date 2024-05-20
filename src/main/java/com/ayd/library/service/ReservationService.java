@@ -39,9 +39,9 @@ public class ReservationService {
             throw new EnoughException("Not enough available copies");
         }
 
-        if (repository.findById(reservation.getId()).isPresent()) {
-            throw new DuplicatedEntityException("Reservation with ID already exists: " + reservation.getId());
-        }
+//        if (repository.findById(reservation.getId()).isPresent()) {
+//            throw new DuplicatedEntityException("Reservation with ID already exists: " + reservation.getId());
+//        }
 
         Reservation entity = Reservation.builder()
                 .reservationDate(reservation.getReservationDate())

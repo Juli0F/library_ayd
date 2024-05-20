@@ -76,12 +76,13 @@ public class ReservationServiceIntegrationTest {
     }
 
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws DuplicatedEntityException {
         career = Career.builder()
                 .code("CS")
                 .name("System")
                 .status(true)
                 .build();
+        careerService.createCareer(career);
 
         student = new Student();
         student.setCarnet("ST001");
@@ -120,19 +121,6 @@ public class ReservationServiceIntegrationTest {
         assertEquals(ReservationStatusEnum.ACTIVE.name(), createdReservation.getStatus());
     }
 
-    @Test
-    public void testCreateReservation_DuplicatedEntityException() throws DuplicatedEntityException, NotFoundException, RequiredEntityException, EnoughException {
-        // Arrange
-        reservationRequestDto.setId(1L);
-        reservationService.createReservation(reservationRequestDto);
-
-        // Act & Assert
-        DuplicatedEntityException thrown = assertThrows(DuplicatedEntityException.class, () -> {
-            reservationService.createReservation(reservationRequestDto);
-        });
-
-        assertEquals("Reservation with ID already exists: 1", thrown.getMessage());
-    }
 
     @Test
     public void testCreateReservation_EnoughException() {

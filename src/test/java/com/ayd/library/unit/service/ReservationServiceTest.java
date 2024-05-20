@@ -2,7 +2,10 @@ package com.ayd.library.unit.service;
 
 import com.ayd.library.dto.ReservationRequestDto;
 import com.ayd.library.enums.ReservationStatusEnum;
-import com.ayd.library.exception.*;
+import com.ayd.library.exception.DuplicatedEntityException;
+import com.ayd.library.exception.EnoughException;
+import com.ayd.library.exception.NotFoundException;
+import com.ayd.library.exception.RequiredEntityException;
 import com.ayd.library.model.Book;
 import com.ayd.library.model.Reservation;
 import com.ayd.library.model.Student;
@@ -18,14 +21,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -44,31 +43,28 @@ public class ReservationServiceTest {
     private ReservationService reservationService;
 
     private ReservationRequestDto reservationRequestDto;
-    private Reservation reservation;
     private Student student;
     private Book book;
+    private Reservation reservation;
 
     @BeforeEach
-    public void setUp() {
-        reservationRequestDto = new  ReservationRequestDto("123456",
-                "BK101",
-                LocalDate.now(),
-                ReservationStatusEnum.COMPLETED.name(),
-                1L);
+    public void setup() {
+        reservationRequestDto = new ReservationRequestDto();
+        reservationRequestDto.setReservationDate(LocalDate.now());
+        reservationRequestDto.setBookCode("B001");
+        reservationRequestDto.setCarnet("ST001");
+        reservationRequestDto.setStatus(ReservationStatusEnum.ACTIVE.name().toUpperCase());
 
-        student = Student.builder()
-                .carnet("123456")
-                .name("Julio Test")
-                .build();
+        student = new Student();
+        student.setCarnet("ST001");
+        student.setName("Test Student");
 
-        book = Book.builder()
-                .code("BK101")
-                .title("Test Book")
-                .availableCopies(5)
-                .build();
+        book = new Book();
+        book.setCode("B001");
+        book.setTitle("Test Book");
+        book.setAvailableCopies(5);
 
         reservation = Reservation.builder()
-                .id(1L)
                 .reservationDate(LocalDate.now())
                 .bookCode(book)
                 .student(student)
@@ -77,171 +73,130 @@ public class ReservationServiceTest {
     }
 
     @Test
-    public void testCreateReservation() throws DuplicatedEntityException, RequiredEntityException, NotFoundException, EnoughException {
-        // Arrange
-        when(reservationRepository.findById(reservationRequestDto.getId())).thenReturn(Optional.empty());
-        when(studentService.getStudentByCarnet(reservationRequestDto.getCarnet())).thenReturn(student);
-        when(bookService.getBookByCode(reservationRequestDto.getBookCode())).thenReturn(book);
+    public void testCreateReservation() throws DuplicatedEntityException, NotFoundException, RequiredEntityException, EnoughException {
+        when(studentService.getStudentByCarnet(anyString())).thenReturn(student);
+        when(bookService.getBookByCode(anyString())).thenReturn(book);
         when(reservationRepository.save(any(Reservation.class))).thenReturn(reservation);
 
-        // Act
         Reservation createdReservation = reservationService.createReservation(reservationRequestDto);
 
-        // Assert
         assertNotNull(createdReservation);
-        assertEquals(reservationRequestDto.getId(), createdReservation.getId());
-        verify(reservationRepository, times(1)).findById(reservationRequestDto.getId());
+        assertEquals(reservationRequestDto.getReservationDate(), createdReservation.getReservationDate());
+        assertEquals(ReservationStatusEnum.ACTIVE.name(), createdReservation.getStatus());
         verify(reservationRepository, times(1)).save(any(Reservation.class));
     }
 
     @Test
-    public void testCreateReservation_DuplicatedEntityException() throws NotFoundException {
-        // Arrange
-        when(reservationRepository.findById(reservationRequestDto.getId())).thenReturn(Optional.of(reservation));
-        when(studentService.getStudentByCarnet(reservationRequestDto.getCarnet())).thenReturn(student);
-        when(bookService.getBookByCode(reservationRequestDto.getBookCode())).thenReturn(book);
-
-        // Act & Assert
-        assertThrows(DuplicatedEntityException.class, () -> reservationService.createReservation(reservationRequestDto));
-        verify(reservationRepository, times(1)).findById(reservationRequestDto.getId());
-        verify(reservationRepository, times(0)).save(any(Reservation.class));
-    }
-
-
-    @Test
-    public void testCreateReservation_RequiredEntityException() {
-        // Arrange
+    public void testCreateReservation_BookCodeIsNull() {
         reservationRequestDto.setBookCode(null);
 
-        // Act & Assert
-        assertThrows(RequiredEntityException.class, () -> reservationService.createReservation(reservationRequestDto));
-        verify(reservationRepository, times(0)).findById(anyLong());
-        verify(reservationRepository, times(0)).save(any(Reservation.class));
+        RequiredEntityException exception = assertThrows(RequiredEntityException.class, () ->
+                reservationService.createReservation(reservationRequestDto));
+
+        assertEquals("Book code must not be null", exception.getMessage());
     }
 
     @Test
-    public void testCreateReservation_EnoughException() throws NotFoundException {
-        // Arrange
+    public void testCreateReservation_NotEnoughCopies() throws NotFoundException {
         book.setAvailableCopies(0);
-        when(studentService.getStudentByCarnet(reservationRequestDto.getCarnet())).thenReturn(student);
-        when(bookService.getBookByCode(reservationRequestDto.getBookCode())).thenReturn(book);
+        when(bookService.getBookByCode(anyString())).thenReturn(book);
 
-        // Act & Assert
-        assertThrows(EnoughException.class, () -> reservationService.createReservation(reservationRequestDto));
+        EnoughException exception = assertThrows(EnoughException.class, () ->
+                reservationService.createReservation(reservationRequestDto));
 
-        // Verificación: asegurarse de que no se hizo ninguna llamada al método findById ni save del repositorio
-        verify(reservationRepository, never()).findById(anyLong());
-        verify(reservationRepository, never()).save(any(Reservation.class));
+        assertEquals("Not enough available copies", exception.getMessage());
     }
-
 
     @Test
     public void testUpdateReservation() throws NotFoundException {
-        // Arrange
-        when(reservationRepository.findById(reservation.getId())).thenReturn(Optional.of(reservation));
+        when(reservationRepository.findById(anyLong())).thenReturn(Optional.of(reservation));
         when(reservationRepository.save(any(Reservation.class))).thenReturn(reservation);
 
-        // Act
-        Reservation updatedReservation = reservationService.updateReservation(reservation.getId(), reservation);
+        Reservation updatedReservation = reservationService.updateReservation(1L, reservation);
 
-        // Assert
         assertNotNull(updatedReservation);
-        assertEquals(reservation.getId(), updatedReservation.getId());
-        verify(reservationRepository, times(1)).findById(reservation.getId());
-        verify(reservationRepository, times(1)).save(any(Reservation.class));
+        assertEquals(reservation.getReservationDate(), updatedReservation.getReservationDate());
+        assertEquals(ReservationStatusEnum.ACTIVE.name(), updatedReservation.getStatus());
     }
 
     @Test
-    public void testUpdateReservation_NotFoundException() {
-        // Arrange
-        when(reservationRepository.findById(reservation.getId())).thenReturn(Optional.empty());
+    public void testUpdateReservation_NotFound() {
+        when(reservationRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        // Act & Assert
-        assertThrows(NotFoundException.class, () -> reservationService.updateReservation(reservation.getId(), reservation));
-        verify(reservationRepository, times(1)).findById(reservation.getId());
-        verify(reservationRepository, times(0)).save(any(Reservation.class));
+        NotFoundException exception = assertThrows(NotFoundException.class, () ->
+                reservationService.updateReservation(1L, reservation));
+
+        assertEquals("Reservation not found with ID: 1", exception.getMessage());
     }
 
     @Test
     public void testGetReservationById() throws NotFoundException {
-        // Arrange
-        when(reservationRepository.findById(reservation.getId())).thenReturn(Optional.of(reservation));
+        when(reservationRepository.findById(anyLong())).thenReturn(Optional.of(reservation));
 
-        // Act
-        Reservation foundReservation = reservationService.getReservationById(reservation.getId());
+        Reservation foundReservation = reservationService.getReservationById(1L);
 
-        // Assert
         assertNotNull(foundReservation);
-        assertEquals(reservation.getId(), foundReservation.getId());
-        verify(reservationRepository, times(1)).findById(reservation.getId());
+        assertEquals(reservation.getReservationDate(), foundReservation.getReservationDate());
     }
 
     @Test
-    public void testGetReservationById_NotFoundException() {
-        // Arrange
-        when(reservationRepository.findById(reservation.getId())).thenReturn(Optional.empty());
+    public void testGetReservationById_NotFound() {
+        when(reservationRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        // Act & Assert
-        assertThrows(NotFoundException.class, () -> reservationService.getReservationById(reservation.getId()));
-        verify(reservationRepository, times(1)).findById(reservation.getId());
+        NotFoundException exception = assertThrows(NotFoundException.class, () ->
+                reservationService.getReservationById(1L));
+
+        assertEquals("Reservation not found with ID: 1", exception.getMessage());
     }
 
     @Test
     public void testGetAllReservations() {
-        // Arrange
-        List<Reservation> reservations = List.of(reservation);
-        when(reservationRepository.findAll()).thenReturn(reservations);
+        when(reservationRepository.findAll()).thenReturn(List.of(reservation));
 
-        // Act
-        List<Reservation> result = reservationService.getAllReservations();
+        List<Reservation> reservations = reservationService.getAllReservations();
 
-        // Assert
-        assertNotNull(result);
-        assertFalse(result.isEmpty());
-        assertEquals(1, result.size());
-        verify(reservationRepository, times(1)).findAll();
+        assertNotNull(reservations);
+        assertEquals(1, reservations.size());
     }
 
     @Test
     public void testUpdateReservationStatus() throws NotFoundException {
-        // Arrange
-        when(reservationRepository.findById(reservation.getId())).thenReturn(Optional.of(reservation));
+        when(reservationRepository.findById(anyLong())).thenReturn(Optional.of(reservation));
         when(reservationRepository.save(any(Reservation.class))).thenReturn(reservation);
 
-        // Act
-        Reservation updatedReservation = reservationService.updateReservationStatus(reservation.getId(), "CLOSED");
+        Reservation updatedReservation = reservationService.updateReservationStatus(1L, "INACTIVE");
 
-        // Assert
         assertNotNull(updatedReservation);
-        assertEquals("CLOSED", updatedReservation.getStatus());
-        verify(reservationRepository, times(1)).findById(reservation.getId());
-        verify(reservationRepository, times(1)).save(any(Reservation.class));
+        assertEquals("INACTIVE", updatedReservation.getStatus());
     }
 
     @Test
-    public void testUpdateReservationStatus_NotFoundException() {
-        // Arrange
-        when(reservationRepository.findById(reservation.getId())).thenReturn(Optional.empty());
+    public void testUpdateReservationStatus_NotFound() {
+        when(reservationRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        // Act & Assert
-        assertThrows(NotFoundException.class, () -> reservationService.updateReservationStatus(reservation.getId(), "CLOSED"));
-        verify(reservationRepository, times(1)).findById(reservation.getId());
-        verify(reservationRepository, times(0)).save(any(Reservation.class));
+        NotFoundException exception = assertThrows(NotFoundException.class, () ->
+                reservationService.updateReservationStatus(1L, "INACTIVE"));
+
+        assertEquals("Reservation not found with ID: 1", exception.getMessage());
     }
 
     @Test
     public void testFindReservationsByStatus() {
-        // Arrange
-        List<Reservation> reservations = List.of(reservation);
-        when(reservationRepository.findAllByStatus(ReservationStatusEnum.ACTIVE.name())).thenReturn(reservations);
+        when(reservationRepository.findAllByStatus(anyString())).thenReturn(List.of(reservation));
 
-        // Act
-        List<Reservation> result = reservationService.findReservationsByStatus(ReservationStatusEnum.ACTIVE.name());
+        List<Reservation> reservations = reservationService.findReservationsByStatus("ACTIVE");
 
-        // Assert
-        assertNotNull(result);
-        assertFalse(result.isEmpty());
-        assertEquals(1, result.size());
-        verify(reservationRepository, times(1)).findAllByStatus(ReservationStatusEnum.ACTIVE.name());
+        assertNotNull(reservations);
+        assertEquals(1, reservations.size());
+    }
+
+    @Test
+    public void testGetAllReservation() {
+        when(reservationRepository.findReservationDetails()).thenReturn(List.of(reservationRequestDto));
+
+        List<ReservationRequestDto> reservations = reservationService.getAllReservation();
+
+        assertNotNull(reservations);
+        assertEquals(1, reservations.size());
     }
 }

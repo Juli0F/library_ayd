@@ -80,7 +80,7 @@ public class StudentServiceIntegrationTest {
     @Test
     public void testCreateStudent() throws DuplicatedEntityException, NotFoundException {
         // Act
-        StudentDto createdStudent = studentService.createStudent(studentDto);
+        var createdStudent = studentService.createStudent(studentDto);
 
         // Assert
         assertNotNull(createdStudent);

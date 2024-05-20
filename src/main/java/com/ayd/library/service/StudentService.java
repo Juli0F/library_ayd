@@ -25,7 +25,7 @@ public class StudentService {
     final CareerService careerService;
 
     @Transactional
-    public StudentDto createStudent(StudentDto studentDto) throws DuplicatedEntityException, NotFoundException {
+    public Student createStudent(StudentDto studentDto) throws DuplicatedEntityException, NotFoundException {
         if(repository.findById(studentDto.getCarnet()).isPresent()) {
             throw new DuplicatedEntityException("Existe la entidad con carnet: " + studentDto.getCarnet());
         }
@@ -40,8 +40,8 @@ public class StudentService {
                 .careerCode(career)
                 .build();
 
-        repository.save(studentEntity);
-        return studentDto;
+        return repository.save(studentEntity);
+        //return studentDto;
     }
 
     @Transactional

@@ -22,6 +22,7 @@ public class BookService {
     public Book createBook(BookRequestDto bookDto) throws DuplicatedEntityException{
         if(repository.findById(bookDto.getCode()).isPresent())
             throw new DuplicatedEntityException("Existe un libro con el codigo: "+bookDto.getCode());
+
         Book book = Book.builder()
                 .code(bookDto.getCode())
                 .title(bookDto.getTitle())

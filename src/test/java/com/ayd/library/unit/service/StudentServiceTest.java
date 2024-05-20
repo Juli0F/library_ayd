@@ -72,7 +72,7 @@ public class StudentServiceTest {
         when(studentRepository.save(any(Student.class))).thenReturn(student);
 
         // Act
-        StudentDto createdStudent = studentService.createStudent(studentDto);
+        var createdStudent = studentService.createStudent(studentDto);
 
         // Assert
         assertNotNull(createdStudent);
