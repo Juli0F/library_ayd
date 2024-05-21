@@ -58,7 +58,7 @@ CREATE TABLE User (
     status SMALLINT
 );
 
-INSERT INTO user(role, name, email, username, password, status)
+INSERT INTO User(role, name, email, username, password, status)
     VALUES ( 'ADMIN','admin', 'admin@library.com', 'admin','$2a$10$pGLfVa82/68NEZILPMwt1OH7mbDUZz2rIyPt7n/qKp/46H8svm9oO',1),
            ( 'LIBRARIAN','user', 'user@library.com', 'librarian','$2a$10$pGLfVa82/68NEZILPMwt1OH7mbDUZz2rIyPt7n/qKp/46H8svm9oO',1),
            ( 'STUDENT','student', 'student@library.com', 'student','$2a$10$pGLfVa82/68NEZILPMwt1OH7mbDUZz2rIyPt7n/qKp/46H8svm9oO',1);
