@@ -18,8 +18,13 @@ jobs:
         with:
           java-version: 17
 
+      - name: Install Docker
+        run: |
+          sudo apt-get update
+          sudo apt-get install docker-ce docker-ce-cli containerd.io -y
+
       - name: Build with Maven
-        run: mvn clean install
+        run: mvn clean install -Dspring.profiles.active=test
 
       - name: Upload JAR as Artifact
         uses: actions/upload-artifact@v2
