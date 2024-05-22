@@ -67,8 +67,8 @@ jobs:
           EC2_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
           echo "$EC2_PRIVATE_KEY" > ec2_key.pem
-          chmod 400 ec2_key.pem
-           mkdir -p ~/.ssh
+          chmod 600 ec2_key.pem
+          mkdir -p ~/.ssh
           
           ssh-keyscan -H $EC2_INSTANCE_IP >> ~/.ssh/known_hosts
           echo "$EC2_PRIVATE_KEY" > ec2_key.pem
