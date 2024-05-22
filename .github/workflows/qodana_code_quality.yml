@@ -34,6 +34,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+      - name: set jdk
+        uses: actions/setups-java@v3
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+      - name: build with maven
+        env:
+          SPRING_PROFILES_ACTIVE: prod
+          run: mvn clean package
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
