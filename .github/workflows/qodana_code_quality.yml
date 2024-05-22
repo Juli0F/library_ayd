@@ -23,7 +23,7 @@ jobs:
           --health-timeout 5s
           --health-retries 3
         env:
-          MYSQL_ROOT_PASSWORD: root
+          MYSQL_ROOT_PASSWORD: rootpassword
           MYSQL_DATABASE: testdb
           MYSQL_USER: testuser
           MYSQL_PASSWORD: testpassword
@@ -49,6 +49,10 @@ jobs:
         run: mvn install -DskipTests
 
       - name: Run tests
+        env:
+          SPRING_DATASOURCE_URL: jdbc:mariadb://localhost:3306/testdb
+          SPRING_DATASOURCE_USERNAME: testuser
+          SPRING_DATASOURCE_PASSWORD: testpassword
         run: mvn test
 
       - name: Build project
