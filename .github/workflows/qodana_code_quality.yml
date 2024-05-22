@@ -27,7 +27,7 @@ jobs:
 #        run: mvn clean install -Dspring.profiles.active=test
       - name: exec
         run: |
-          mvn install
+          mvn install -Dspring.profiles.active=test
           mvn spring-boot:run
 
       - name: Upload JAR as Artifact
