@@ -1,7 +1,10 @@
-name: Spring AYD
+name: CI/CD for Spring Boot Application
 
 on:
   push:
+    branches:
+      - main
+  pull_request:
     branches:
       - main
 
@@ -9,55 +12,59 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    services:
+      mariadb:
+        image: mariadb:10.5
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd "mysqladmin ping -h localhost"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 3
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: testdb
+          MYSQL_USER: testuser
+          MYSQL_PASSWORD: testpassword
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v2
         with:
-          java-version: 17
+          distribution: 'adopt'
+          java-version: '17'
 
-#      - name: Install Docker
-#        run: |
-#          sudo apt-get update
-#          sudo apt-get install docker-ce docker-ce-cli containerd.io -y
-
-#      - name: Build with Maven
-#        run: mvn clean install -Dspring.profiles.active=test
-      - name: exec
-        run: |
-          mvn install -Dspring.profiles.active=test
-          mvn spring-boot:run
-
-      - name: Upload JAR as Artifact
-        uses: actions/upload-artifact@v2
+      - name: Cache Maven packages
+        uses: actions/cache@v2
         with:
-          name: library-artifact
-          path: target/library-0.0.1-SNAPSHOT.jar
+          path: ~/.m2
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
+      - name: Install dependencies
+        run: mvn install -DskipTests
 
-    steps:
-      - name: Download JAR
-        uses: actions/download-artifact@v2
-        with:
-          name: library-artifact
+      - name: Run tests
+        run: mvn test
 
-      - name: Copy files via SCP
+      - name: Build project
+        run: mvn package -DskipTests
+
+      - name: Deploy to EC2
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: us-west-2
+          INSTANCE_ID: ${{ secrets.EC2_INSTANCE_ID }}
         run: |
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > key.pem
-          chmod 600 key.pem
-          scp -i key.pem -o "StrictHostKeyChecking=no" library-0.0.1-SNAPSHOT.jar ec2-user@${{secrets.IP_VPC}}:/home/ec2-user/
-
-      - name: Deploy JAR on EC2
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        run: |
-          ssh -i key.pem -o "StrictHostKeyChecking=no" ec2-user@${{secrets.IP_VPC}} << 'EOF'
-            nohup java -jar /home/ec2-user/library-0.0.1-SNAPSHOT.jar > /dev/null 2>&1 &
+          aws ec2 describe-instances --instance-ids $INSTANCE_ID
+          scp -o StrictHostKeyChecking=no target/your-app.jar ec2-user@${{ secrets.EC2_INSTANCE_PUBLIC_DNS }}:/home/ec2-user/
+          ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_INSTANCE_PUBLIC_DNS }} << 'EOF'
+            sudo systemctl stop your-app
+            sudo cp /home/ec2-user/your-app.jar /opt/your-app/your-app.jar
+            sudo systemctl start your-app
           EOF
