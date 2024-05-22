@@ -52,21 +52,25 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
-#      - name: set ssh key
-#        env:
-#            SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY }}
-#            run: |
-#              echo "${{ secrets.SSH.PRIVATE_KEY }}" > key.pem
-#              chmod 600 key.pem
-#              scp -i key.pem -o "StrictHostKeyChecking=no" library-0.0.1-SNAPSHOT.jar ec2-user@${{secrets.IP_VPC}}:/home/ec2-user/
-#              echo "copy finalize"
+
+      - name: set ssh key
+        env:
+            SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY }}
+            run: |
+              echo "${{ secrets.SSH_PRIVATE_KEY }}" > key.pem
+              chmod 600 key.pem
+              scp -i key.pem -o "StrictHostKeyChecking=no" library-0.0.1-SNAPSHOT.jar ec2-user@${{secrets.IP_VPC}}
+              java -jar library-0.0.1-SNAPSHOT.jar
+              
+
       - name: pwd
         run: |
           ls
           ls target
-      - name: Deploy to production EC2 instance
-        env:
-          EC2_INSTANCE_IP: ${{ secrets.IP_VPC }}
-        run: |
-          scp -o StrictHostKeyChecking=no -r target/library-0.0.1-SNAPSHOT.jar ec2-user@$EC2_INSTANCE_IP
-          ssh -o StrictHostKeyChecking=no ec2-user@$EC2_INSTANCE_IP
+
+#      - name: Deploy to production EC2 instance
+#        env:
+#          EC2_INSTANCE_IP: ${{ secrets.IP_VPC }}
+#        run: |
+#          scp -o StrictHostKeyChecking=no -r target/library-0.0.1-SNAPSHOT.jar ec2-user@$EC2_INSTANCE_IP
+#          ssh -o StrictHostKeyChecking=no ec2-user@$EC2_INSTANCE_IP
