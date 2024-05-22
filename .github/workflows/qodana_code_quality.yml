@@ -66,8 +66,8 @@ jobs:
           INSTANCE_ID: ${{ secrets.EC2_INSTANCE_ID }}
         run: |
           aws ec2 describe-instances --instance-ids $INSTANCE_ID
-          scp -o StrictHostKeyChecking=no target/your-app.jar ec2-user@${{ secrets.EC2_INSTANCE_PUBLIC_DNS }}:/home/ec2-user/
-          ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.EC2_INSTANCE_PUBLIC_DNS }} << 'EOF'
+          scp -o StrictHostKeyChecking=no target/your-app.jar ec2-user@${{ secrets.IP_VPC }}:/home/ec2-user/
+          ssh -o StrictHostKeyChecking=no ec2-user@${{ secrets.IP_VPC }} << 'EOF'
             sudo systemctl stop your-app
             sudo cp /home/ec2-user/your-app.jar /opt/your-app/your-app.jar
             sudo systemctl start your-app
