@@ -44,7 +44,7 @@ jobs:
       - name: Build with Maven
         env:
           SPRING_PROFILES_ACTIVE: prod
-        run: mvn clean package
+        run: mvn clean install -DskipTests.
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -57,11 +57,28 @@ jobs:
         run: |
           ls
 
-
-      - name: Deploy to production EC2 instance
+      - name: Deploy to EC2
         env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: us-east-2
+          INSTANCE_ID: ${{ secrets.INSTANCE_ID }}
           EC2_INSTANCE_IP: ${{ secrets.IP_VPC }}
           EC2_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
-          scp -o StrictHostKeyChecking=no -i $EC2_PRIVATE_KEY -r ./target/library-0.0.1-SNAPSHOT.jar ec2-user@$EC2_INSTANCE_IP:/home/ec2-user
-          ssh -o StrictHostKeyChecking=no -i $EC2_PRIVATE_KEY ec2-user@$EC2_INSTANCE_IP 'java -jar /home/ec2-user/library-0.0.1-SNAPSHOT.jar'
+          ls -l ${{ secrets.SSH_PRIVATE_KEY }}
+          cat ${{ secrets.SSH_PRIVATE_KEY }} | head -n 1
+    
+          echo "${SSH_PRIVATE_KEY}" > ec2_key.pem
+          chmod 400 ec2_key.pem
+          
+          scp -o StrictHostKeyChecking=no -i ec2_key.pem -r ./target/library-0.0.1-SNAPSHOT.jar ec2-user@${EC2_INSTANCE_IP}:/home/ec2-user/
+          ssh -o StrictHostKeyChecking=no -i ec2_key.pem ec2-user@${EC2_INSTANCE_IP} 'java -jar /home/ec2-user/library-0.0.1-SNAPSHOT.jar'
+
+#      - name: Deploy to production EC2 instance
+#        env:
+#          EC2_INSTANCE_IP: ${{ secrets.IP_VPC }}
+#          EC2_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+#        run: |
+#          scp -o StrictHostKeyChecking=no -i $EC2_PRIVATE_KEY -r ./target/library-0.0.1-SNAPSHOT.jar ec2-user@$EC2_INSTANCE_IP:/home/ec2-user
+#          ssh -o StrictHostKeyChecking=no -i $EC2_PRIVATE_KEY ec2-user@$EC2_INSTANCE_IP 'java -jar /home/ec2-user/library-0.0.1-SNAPSHOT.jar'
