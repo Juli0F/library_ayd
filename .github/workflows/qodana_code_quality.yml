@@ -66,7 +66,7 @@ jobs:
           EC2_INSTANCE_IP: ${{ secrets.IP_VPC }}
           EC2_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
-          echo "${SSH_PRIVATE_KEY}" > ec2_key.pem
+          echo "${EC2_PRIVATE_KEY}" > ec2_key.pem
           chmod 400 ec2_key.pem
           cat ec2_key.pem | head -n 1
           
