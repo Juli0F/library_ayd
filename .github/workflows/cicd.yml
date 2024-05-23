@@ -61,6 +61,17 @@ jobs:
           mkdir -p ~/.ssh
           ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
 
+      - name: Stop Existing Java Process on Port 3000
+        env:
+          EC2_INSTANCE_IP: ${{ secrets.IP_VPC }}
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ec2-user@$EC2_INSTANCE_IP  << 'EOF'
+            PID=$(lsof -t -i:3000)
+            if [ -n "$PID" ]; then
+              kill -9 $PID
+            fi
+          EOF
+
       - name: Deploy to EC2
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -70,4 +81,4 @@ jobs:
           EC2_INSTANCE_IP: ${{ secrets.IP_VPC }}
         run: |
           scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -r ./target/library-0.0.1-SNAPSHOT.jar ec2-user@$EC2_INSTANCE_IP:/home/ec2-user/
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ec2-user@$EC2_INSTANCE_IP java -jar /home/ec2-user/library-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ec2-user@$EC2_INSTANCE_IP  nohup java -jar /home/ec2-user/library-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod > /home/ec2-user/application.log 2>&1 &
