@@ -33,7 +33,6 @@ public class SecurityConfig {
     private final JwtAuthFilter authFilter;
     private final UserService userService;
 
-    @Value("${front.url}")
     private String frontUrl;
 
     @Bean
@@ -54,7 +53,7 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         var configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of(frontUrl));
+        configuration.setAllowedOrigins(List.of("http://angular-bucket-ayd.s3-website.us-east-2.amazonaws.com"));
         configuration.setAllowedMethods(List.of("*"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setExposedHeaders(List.of("*"));
