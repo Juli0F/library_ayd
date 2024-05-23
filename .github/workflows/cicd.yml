@@ -63,7 +63,7 @@ jobs:
 
       - name: Stop Existing Java Process on Port 3000
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          EC2_INSTANCE_IP: ${{ secrets.IP_VPC }}
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ec2-user@$EC2_INSTANCE_IP  << 'EOF'
             PID=$(lsof -t -i:3000)
