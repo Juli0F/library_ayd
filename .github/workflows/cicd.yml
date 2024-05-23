@@ -70,4 +70,4 @@ jobs:
           EC2_INSTANCE_IP: ${{ secrets.IP_VPC }}
         run: |
           scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -r ./target/library-0.0.1-SNAPSHOT.jar ec2-user@$EC2_INSTANCE_IP:/home/ec2-user/
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ec2-user@$EC2_INSTANCE_IP java -jar /home/ec2-user/library-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ec2-user@$EC2_INSTANCE_IP
