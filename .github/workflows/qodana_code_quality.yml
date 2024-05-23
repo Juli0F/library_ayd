@@ -54,6 +54,14 @@ jobs:
           INSTANCE_ID: ${{ secrets.INSTANCE_ID }}
           EC2_INSTANCE_IP: ${{ secrets.IP_VPC }}
           EC2_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        run: |          
-          scp -o StrictHostKeyChecking=no -i <(echo "$EC2_PRIVATE_KEY") -r ./target/library-0.0.1-SNAPSHOT.jar ec2-user@${EC2_INSTANCE_IP}:/home/ec2-user/
-          ssh -o StrictHostKeyChecking=no -i <(echo "$EC2_PRIVATE_KEY") ec2-user@${EC2_INSTANCE_IP} 'java -jar /home/ec2-user/library-0.0.1-SNAPSHOT.jar'
+        run: |
+          
+          echo "${SSH_PRIVATE_KEY}" > ec2_key.pem
+          chmod 400 ec2_key.pem
+  
+          cat ec2_key.pem | head -n 5
+          cat ec2_key.pem | tail -n 5
+          
+          # Use the key for scp and ssh
+          scp -o StrictHostKeyChecking=no -i ec2_key.pem -r ./target/library-0.0.1-SNAPSHOT.jar ec2-user@${EC2_INSTANCE_IP}:/home/ec2-user/
+          ssh -o StrictHostKeyChecking=no -i ec2_key.pem ec2-user@${EC2_INSTANCE_IP} 'java -jar /home/ec2-user/library-0.0.1-SNAPSHOT.jar'
