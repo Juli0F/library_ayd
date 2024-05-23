@@ -66,16 +66,18 @@ jobs:
           EC2_INSTANCE_IP: ${{ secrets.IP_VPC }}
           EC2_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
-          echo "$EC2_PRIVATE_KEY" > ec2_key.pem
-          chmod 600 ec2_key.pem
-          mkdir -p ~/.ssh
-          
-          ssh-keyscan -H $EC2_INSTANCE_IP >> ~/.ssh/known_hosts
-          echo "$EC2_PRIVATE_KEY" > ec2_key.pem
-          
-          echo "imprimiendo key"
-          cat ec2_key.pem
-          chmod 400 ec2_key.pem
+#          rm -f ec2_key.pem
+#          echo "$EC2_PRIVATE_KEY" > ec2_key.pem
+#          chmod 400 ec2_key.pem
+#          echo "$EC2_PRIVATE_KEY" > ec2_key.pem
+#          mkdir -p ~/.ssh
+#
+#          ssh-keyscan -H $EC2_INSTANCE_IP >> ~/.ssh/known_hosts
+#          echo "$EC2_PRIVATE_KEY" > ec2_key.pem
+#
+#          echo "imprimiendo key"
+#          cat ec2_key.pem
+#          chmod 400 ec2_key.pem
           
           scp -o StrictHostKeyChecking=no -i <(echo "$EC2_PRIVATE_KEY") -r ./target/library-0.0.1-SNAPSHOT.jar ec2-user@${EC2_INSTANCE_IP}:/home/ec2-user/
           ssh -o StrictHostKeyChecking=no -i <(echo "$EC2_PRIVATE_KEY") ec2-user@${EC2_INSTANCE_IP} 'java -jar /home/ec2-user/library-0.0.1-SNAPSHOT.jar'
