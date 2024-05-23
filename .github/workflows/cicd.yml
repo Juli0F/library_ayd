@@ -65,7 +65,7 @@ jobs:
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
-          ssh -i key.pem -o "StrictHostKeyChecking=no" ec2-user@18.119.157.178 << 'EOF'
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ec2-user@$EC2_INSTANCE_IP  << 'EOF'
             PID=$(lsof -t -i:3000)
             if [ -n "$PID" ]; then
               kill -9 $PID
