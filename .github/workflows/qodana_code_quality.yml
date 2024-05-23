@@ -41,7 +41,9 @@ jobs:
           distribution: 'adopt'
 
       - name: print pwd
-        run: pwd
+        run: |
+          pwd
+          ls
 
       - name: Set up SSH agent
         id: ssh-agent-setup
